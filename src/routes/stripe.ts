@@ -1,41 +1,26 @@
 // src/routes/stripe.ts
-import { Router } from 'express';
+import express from 'express';
 import {
   checkoutSessionHosted,
   checkoutSessionEmbedded,
   webhook,
 } from '../controllers/stripeController';
 
-const router = Router();
+const router = express.Router();
 
 // ✅ Hosted Checkout (används i frontend)
-router.post('/checkout-session-hosted', async (req, res) => {
-  try {
-    await checkoutSessionHosted(req, res);
-  } catch (error) {
-    console.error('Fel i hosted checkout:', error);
-    res.status(500).json({ error: 'Serverfel vid hosted checkout' });
-  }
+router.post('/checkout-session-hosted', (req, res) => {
+  checkoutSessionHosted(req, res);
 });
 
 // 🟡 Embedded Checkout (valfritt)
-router.post('/checkout-session-embedded', async (req, res) => {
-  try {
-    await checkoutSessionEmbedded(req, res);
-  } catch (error) {
-    console.error('Fel i embedded checkout:', error);
-    res.status(500).json({ error: 'Serverfel vid embedded checkout' });
-  }
+router.post('/embedded', (req, res) => {
+  checkoutSessionEmbedded(req, res);
 });
 
-// 🔵 Webhook (placeholder)
-router.post('/webhook', async (req, res) => {
-  try {
-    await webhook(req, res);
-  } catch (error) {
-    console.error('Fel i webhook:', error);
-    res.status(500).json({ error: 'Serverfel vid webhook' });
-  }
+// 🔵 Webhook (valfritt)
+router.post('/webhook', (req, res) => {
+  webhook(req, res);
 });
 
 export default router;
