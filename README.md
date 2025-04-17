@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Instructions
 
 ## Watch the recorded lesson
@@ -526,3 +527,6 @@ In the recorded lesson we go through:
 	"message": "Token cleared"
 }
 ``` 
+=======
+# ecommerce-api-new
+>>>>>>> 7a247073af5ad5ee8f4de2f5f0377141d7c3ed50
