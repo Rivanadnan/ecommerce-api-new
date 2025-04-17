@@ -1,16 +1,14 @@
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
-import {db} from  '../config/db';
-
+import { db } from '../config/db';
 
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-02-24.acacia',
+  apiVersion: '2025-03-31.basil',
 });
 
-// 🟢 Hosted Checkout
 export const checkoutSessionHosted = async (req: Request, res: Response) => {
   const { customer, cart } = req.body;
 
@@ -19,24 +17,25 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
   }
 
   try {
-    const [existing] = await db.promise().query(
+    const [existingRows] = await db.query(
       'SELECT * FROM customers WHERE email = ?',
       [customer.email]
     );
 
     let customerId;
+    const existing = existingRows as any[];
 
-    if ((existing as any).length > 0) {
-      customerId = (existing as any)[0].id;
+    if (existing.length > 0) {
+      customerId = existing[0].id;
     } else {
-      const [result] = await db.promise().query(
+      const [insertResult] = await db.query(
         'INSERT INTO customers (name, email) VALUES (?, ?)',
         [customer.name, customer.email]
       );
-      customerId = (result as any).insertId;
+      customerId = (insertResult as any).insertId;
     }
 
-    const [orderResult] = await db.promise().query(
+    const [orderResult] = await db.query(
       'INSERT INTO orders (customer_id, payment_status, payment_id, order_status) VALUES (?, ?, ?, ?)',
       [customerId, 'Unpaid', '', 'Pending']
     );
@@ -44,7 +43,7 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
     const orderId = (orderResult as any).insertId;
 
     for (const item of cart) {
-      await db.promise().query(
+      await db.query(
         'INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)',
         [orderId, item.id, 1]
       );
@@ -63,14 +62,14 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
         },
         quantity: 1,
       })),
-      success_url: `http://localhost:5173/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: 'http://localhost:5173/checkout',
+      success_url: `https://e-shop-nu-two.vercel.app/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: 'https://e-shop-nu-two.vercel.app/checkout',
       metadata: {
         order_id: orderId.toString(),
       },
     });
 
-    await db.promise().query(
+    await db.query(
       'UPDATE orders SET payment_id = ?, payment_status = ?, order_status = ? WHERE id = ?',
       [session.id, 'Unpaid', 'Pending', orderId]
     );
@@ -82,13 +81,10 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
   }
 };
 
-// 🟡 Embedded Checkout (placeholder om du inte använder den än)
-export const checkoutSessionEmbedded = async (req: Request, res: Response) => {
+export const checkoutSessionEmbedded = async (_: Request, res: Response) => {
   return res.status(501).json({ message: 'Embedded checkout ej implementerad' });
 };
 
-// 🔵 Webhook (placeholder)
-export const webhook = async (req: Request, res: Response) => {
+export const webhook = async (_: Request, res: Response) => {
   return res.status(200).json({ message: 'Webhook mottagen (test)' });
 };
-

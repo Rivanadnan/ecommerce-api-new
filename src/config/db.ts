@@ -9,7 +9,7 @@ export const db = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: false, // 🔑 LÖSNINGEN!
+    rejectUnauthorized: false, // 🔐 LÖSNINGEN!
     ca: process.env.DB_CA?.replace(/\\n/g, '\n'),
   },
 });
