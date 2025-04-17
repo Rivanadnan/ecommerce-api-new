@@ -5,14 +5,27 @@ import {
   createCustomer, 
   updateCustomer, 
   deleteCustomer, 
-  getCustomerByEmail} from "../controllers/customerController";
+  getCustomerByEmail 
+} from "../controllers/customerController";
+
 const router = express.Router();
 
-router.get("/", getCustomers)
-router.get("/:id", getCustomerById)
-router.get("/email/:email", getCustomerByEmail)
-router.post("/", createCustomer)
-router.patch("/:id", updateCustomer)
-router.delete("/:id", deleteCustomer)
+// 🟢 GET alla kunder
+router.get("/", getCustomers);
 
-export default router
+// 🟢 GET kund via e-post (måste komma innan :id)
+router.get("/email/:email", getCustomerByEmail);
+
+// 🟢 GET kund via ID
+router.get("/:id", getCustomerById);
+
+// 🟢 POST skapa ny kund
+router.post("/", createCustomer);
+
+// 🟡 PATCH uppdatera kund
+router.patch("/:id", updateCustomer);
+
+// 🔴 DELETE radera kund
+router.delete("/:id", deleteCustomer);
+
+export default router;

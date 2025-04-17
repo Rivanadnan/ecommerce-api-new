@@ -1,3 +1,4 @@
+// src/index.ts
 import express from "express";
 import { connectDB } from "./config/db";
 import cookieParser from "cookie-parser";
@@ -8,11 +9,13 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Tillåt frontend både från localhost och från Vercel
+// ✅ Kör connectDB så vi ser om databasen är aktiv
+connectDB();
+
 app.use(cors({
   origin: [
-    "http://localhost:5173", // 👈 lokal utveckling
-    "https://e-shop-nu-two.vercel.app", // 👈 din frontend på Vercel
+    "http://localhost:5173",
+    "https://e-shop-nu-two.vercel.app",
   ],
   credentials: true,
 }));
@@ -20,7 +23,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// 🛣️ Routes
+// ✅ ROUTES – hämtas från dina route-filer (INTE controllers direkt)
 import productRouter from "./routes/products";
 import customerRouter from "./routes/customers";
 import orderRouter from "./routes/orders";
@@ -35,18 +38,11 @@ app.use("/order-items", orderItemRouter);
 app.use("/stripe", stripeRouter);
 app.use("/auth", authRouter);
 
-// 🌐 Test-rutt
+// Test-rutt
 app.get("/", (_, res) => {
   res.send("✅ E-commerce API is running!");
 });
 
-// 🚀 Start server lokalt
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`🚀 Server is running at http://localhost:${PORT}`);
-  });
-}
-
-// ✅ Export för Vercel
+// ✅ Exportera för Vercel
 export default app;
+
