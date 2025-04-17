@@ -17,35 +17,34 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
   }
 
   try {
-    const [existingRows] = await db.query(
+    const [existing]: any = await db.query(
       'SELECT * FROM customers WHERE email = ?',
       [customer.email]
     );
 
     let customerId;
-    const existing = existingRows as any[];
 
     if (existing.length > 0) {
       customerId = existing[0].id;
     } else {
-      const [insertResult] = await db.query(
+      const [result]: any = await db.query(
         'INSERT INTO customers (name, email) VALUES (?, ?)',
         [customer.name, customer.email]
       );
-      customerId = (insertResult as any).insertId;
+      customerId = result.insertId;
     }
 
-    const [orderResult] = await db.query(
+    const [orderResult]: any = await db.query(
       'INSERT INTO orders (customer_id, payment_status, payment_id, order_status) VALUES (?, ?, ?, ?)',
       [customerId, 'Unpaid', '', 'Pending']
     );
 
-    const orderId = (orderResult as any).insertId;
+    const orderId = orderResult.insertId;
 
     for (const item of cart) {
       await db.query(
         'INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)',
-        [orderId, item.id, 1]
+        [orderId, item.id, item.quantity || 1]
       );
     }
 
@@ -60,10 +59,10 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
           },
           unit_amount: Math.round(item.price * 100),
         },
-        quantity: 1,
+        quantity: item.quantity || 1,
       })),
       success_url: `https://e-shop-nu-two.vercel.app/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: 'https://e-shop-nu-two.vercel.app/checkout',
+      cancel_url: `https://e-shop-nu-two.vercel.app/checkout`,
       metadata: {
         order_id: orderId.toString(),
       },
@@ -76,15 +75,15 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
 
     res.json({ url: session.url });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Fel i checkoutSessionHosted:', err);
     res.status(500).json({ error: 'Fel vid skapande av checkout-session' });
   }
 };
 
-export const checkoutSessionEmbedded = async (_: Request, res: Response) => {
+export const checkoutSessionEmbedded = async (req: Request, res: Response) => {
   return res.status(501).json({ message: 'Embedded checkout ej implementerad' });
 };
 
-export const webhook = async (_: Request, res: Response) => {
+export const webhook = async (req: Request, res: Response) => {
   return res.status(200).json({ message: 'Webhook mottagen (test)' });
 };
