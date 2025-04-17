@@ -13,11 +13,12 @@ app.use(cookieParser());
 // 🛠️ FIX: Tillåt frontend från både lokal och Vercel
 app.use(cors({
   origin: [
-    "http://localhost:5173",
-    "https://e-shop-nu-two.vercel.app"
+    "http://localhost:5173", // 👈 för din lokala frontend
+    "https://e-shop-nu-two.vercel.app", // 👈 för livesatt Vercel-frontend
   ],
   credentials: true,
 }));
+
 
 // 🧭 Routes
 import productRouter from "./routes/products";
