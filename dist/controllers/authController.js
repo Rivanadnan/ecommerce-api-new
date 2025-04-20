@@ -1,9 +1,24 @@
-import { db } from '../config/db';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { logError } from "../utilities/logger";
-import { ACCESS_TOKEN_SECRET } from "../constants/env";
-export const login = async (req, res) => {
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.register = exports.clearToken = exports.refreshToken = exports.login = void 0;
+const db_1 = require("../config/db");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const logger_1 = require("../utilities/logger");
+const env_1 = require("../constants/env");
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = null;
     const { username, password } = req.body;
     if (username === undefined || password === undefined) {
@@ -12,7 +27,7 @@ export const login = async (req, res) => {
     }
     try {
         const sql = "SELECT * FROM users WHERE username = ?";
-        const [rows] = await db.query(sql, [username]);
+        const [rows] = yield db_1.db.query(sql, [username]);
         if (rows && rows.length > 0) {
             user = rows[0];
         }
@@ -20,12 +35,12 @@ export const login = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
             return;
         }
-        if (user && await bcrypt.compare(password.toString(), user.password)) {
+        if (user && (yield bcrypt_1.default.compare(password.toString(), user.password))) {
             const userInfo = {
                 username: user.username,
                 created_at: user.created_at,
             };
-            const refreshToken = jwt.sign(userInfo, ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
+            const refreshToken = jsonwebtoken_1.default.sign(userInfo, env_1.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 secure: false,
@@ -33,7 +48,7 @@ export const login = async (req, res) => {
                 maxAge: 1000 * 60 * 60 * 24 * 7,
                 path: '/auth/refresh-token'
             });
-            const accessToken = jwt.sign(userInfo, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+            const accessToken = jsonwebtoken_1.default.sign(userInfo, env_1.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
             res.json({
                 user: { username: userInfo.username },
                 expires_in: 60 * 15, // 15 minutes
@@ -47,16 +62,17 @@ export const login = async (req, res) => {
         }
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
-export const refreshToken = async (req, res) => {
+});
+exports.login = login;
+const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userInfo = {
             username: req.user.username,
             created_at: req.user.created_at,
         };
-        const refreshToken = jwt.sign(userInfo, ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
+        const refreshToken = jsonwebtoken_1.default.sign(userInfo, env_1.ACCESS_TOKEN_SECRET, { expiresIn: '7d' });
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: false,
@@ -64,7 +80,7 @@ export const refreshToken = async (req, res) => {
             maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
             path: '/auth/refresh-token'
         });
-        const accessToken = jwt.sign(userInfo, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+        const accessToken = jsonwebtoken_1.default.sign(userInfo, env_1.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
         res.json({
             user: { username: userInfo.username },
             expires_in: 60 * 15, // 15 minutes
@@ -72,10 +88,11 @@ export const refreshToken = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
-export const clearToken = async (req, res) => {
+});
+exports.refreshToken = refreshToken;
+const clearToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.clearCookie('refreshToken', { path: '/auth/refresh-token' });
         res.json({ success: true, message: 'Token cleared' });
@@ -83,26 +100,28 @@ export const clearToken = async (req, res) => {
     catch (error) {
         res.json({ success: false, message: error });
     }
-};
-export const register = async (req, res) => {
+});
+exports.clearToken = clearToken;
+const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
     if (username === undefined || password === undefined) {
         res.status(400).json({ success: false, message: "Missing required fields (username/password)" });
         return;
     }
     try {
-        const hashedPassword = await bcrypt.hash(password.toString(), 10);
+        const hashedPassword = yield bcrypt_1.default.hash(password.toString(), 10);
         const sql = `
       INSERT INTO users (username, password)
       VALUES (?, ?)
     `;
         const params = [username, hashedPassword];
-        await db.query(sql, params);
+        yield db_1.db.query(sql, params);
         res.status(201).json({ success: true, message: 'User registered', user: {
                 username: username
             } });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.register = register;

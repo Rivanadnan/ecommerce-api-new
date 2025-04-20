@@ -1,7 +1,19 @@
-import { db } from "../config/db";
-import { logError } from "../utilities/logger";
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteOrder = exports.updateOrder = exports.createOrder = exports.updateOrderBySessionId = exports.getOrderBySessionId = exports.getOrderById = exports.getOrders = void 0;
+const db_1 = require("../config/db");
+const logger_1 = require("../utilities/logger");
 // 🔹 GET ALL ORDERS
-export const getOrders = async (_, res) => {
+const getOrders = (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const sql = `
       SELECT 
@@ -24,15 +36,16 @@ export const getOrders = async (_, res) => {
         customers.created_at AS customers_created_at
       FROM orders
       LEFT JOIN customers ON orders.customer_id = customers.id`;
-        const [rows] = await db.query(sql);
+        const [rows] = yield db_1.db.query(sql);
         res.json(rows);
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.getOrders = getOrders;
 // 🔹 GET ORDER BY ID
-export const getOrderById = async (req, res) => {
+const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     try {
         const sql = `
@@ -45,17 +58,18 @@ export const getOrderById = async (req, res) => {
       LEFT JOIN order_items ON orders.id = order_items.order_id
       WHERE orders.id = ?
     `;
-        const [rows] = await db.query(sql, [id]);
+        const [rows] = yield db_1.db.query(sql, [id]);
         rows && rows.length > 0
             ? res.json(formatOrderDetails(rows))
             : res.status(404).json({ message: "Order not found" });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.getOrderById = getOrderById;
 // 🔹 GET ORDER BY SESSION ID
-export const getOrderBySessionId = async (req, res) => {
+const getOrderBySessionId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const session_id = req.params.session_id;
     try {
         const sql = `
@@ -68,17 +82,18 @@ export const getOrderBySessionId = async (req, res) => {
       LEFT JOIN order_items ON orders.id = order_items.order_id
       WHERE orders.payment_id = ?
     `;
-        const [rows] = await db.query(sql, [session_id]);
+        const [rows] = yield db_1.db.query(sql, [session_id]);
         rows && rows.length > 0
             ? res.json(formatOrderDetails(rows))
             : res.status(404).json({ message: "Order not found" });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.getOrderBySessionId = getOrderBySessionId;
 // 🔹 UPDATE ORDER BY SESSION ID
-export const updateOrderBySessionId = async (req, res) => {
+const updateOrderBySessionId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const session_id = req.params.session_id;
     const { payment_status, order_status } = req.body;
     try {
@@ -88,15 +103,16 @@ export const updateOrderBySessionId = async (req, res) => {
       WHERE payment_id = ?
     `;
         const params = [payment_status, order_status, session_id];
-        const [result] = await db.query(sql, params);
+        const [result] = yield db_1.db.query(sql, params);
         result.affectedRows === 0
             ? res.status(404).json({ message: "Order not found" })
             : res.json({ message: "Order updated" });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.updateOrderBySessionId = updateOrderBySessionId;
 // 🔹 FORMAT ORDER
 const formatOrderDetails = (rows) => ({
     id: rows[0].order_id,
@@ -126,7 +142,7 @@ const formatOrderDetails = (rows) => ({
         : [],
 });
 // 🔹 CREATE ORDER
-export const createOrder = async (req, res) => {
+const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { customer_id, payment_status, payment_id, order_status } = req.body;
     try {
         const sql = `
@@ -135,23 +151,24 @@ export const createOrder = async (req, res) => {
     `;
         const totalPrice = req.body.order_items.reduce((total, item) => total + item.quantity * item.unit_price, 0);
         const params = [customer_id, totalPrice, payment_status, payment_id, order_status];
-        const [result] = await db.query(sql, params);
+        const [result] = yield db_1.db.query(sql, params);
         if (result.insertId) {
             const order_id = result.insertId;
             const orderItems = req.body.order_items;
             for (const orderItem of orderItems) {
-                const data = { ...orderItem, order_id };
-                await createOrderItem(data);
+                const data = Object.assign(Object.assign({}, orderItem), { order_id });
+                yield createOrderItem(data);
             }
         }
         res.status(201).json({ message: "Order created", id: result.insertId });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.createOrder = createOrder;
 // 🔹 CREATE ORDER ITEM
-const createOrderItem = async (data) => {
+const createOrderItem = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const { order_id, product_id, product_name, quantity, unit_price } = data;
     try {
         const sql = `
@@ -164,14 +181,14 @@ const createOrderItem = async (data) => {
       ) VALUES (?, ?, ?, ?, ?)
     `;
         const params = [order_id, product_id, product_name, quantity, unit_price];
-        await db.query(sql, params);
+        yield db_1.db.query(sql, params);
     }
     catch (error) {
         throw new Error();
     }
-};
+});
 // 🔹 UPDATE ORDER BY ID
-export const updateOrder = async (req, res) => {
+const updateOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const { payment_status, payment_id, order_status } = req.body;
     try {
@@ -181,26 +198,28 @@ export const updateOrder = async (req, res) => {
       WHERE id = ?
     `;
         const params = [payment_status, payment_id, order_status, id];
-        const [result] = await db.query(sql, params);
+        const [result] = yield db_1.db.query(sql, params);
         result.affectedRows === 0
             ? res.status(404).json({ message: "Order not found" })
             : res.json({ message: "Order updated" });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.updateOrder = updateOrder;
 // 🔹 DELETE ORDER
-export const deleteOrder = async (req, res) => {
+const deleteOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     try {
         const sql = "DELETE FROM orders WHERE id = ?";
-        const [result] = await db.query(sql, [id]);
+        const [result] = yield db_1.db.query(sql, [id]);
         result.affectedRows === 0
             ? res.status(404).json({ message: "Order not found" })
             : res.json({ message: "Order deleted" });
     }
     catch (error) {
-        res.status(500).json({ error: logError(error) });
+        res.status(500).json({ error: (0, logger_1.logError)(error) });
     }
-};
+});
+exports.deleteOrder = deleteOrder;
