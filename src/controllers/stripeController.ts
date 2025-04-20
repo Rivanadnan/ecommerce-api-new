@@ -5,8 +5,12 @@ import { db } from '../config/db';
 
 dotenv.config();
 
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+//   apiVersion: '2025-03-31.basil',
+// });
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-03-31.basil',
+  apiVersion: '2022-11-15',
 });
 
 export const checkoutSessionHosted = async (req: Request, res: Response) => {
