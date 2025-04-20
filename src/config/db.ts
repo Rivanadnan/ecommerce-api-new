@@ -1,5 +1,7 @@
+// src/config/db.ts
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 export const db = mysql.createPool({
@@ -9,8 +11,8 @@ export const db = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: false, // ✅ krävs för Aiven
-    ca: process.env.DB_CA?.replace(/\\n/g, "\n"),
+    rejectUnauthorized: false,
+    ca: process.env.DB_SSL_CERT?.replace(/\\n/g, '\n'),
   },
 });
 
