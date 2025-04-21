@@ -21,14 +21,14 @@ dotenv_1.default.config();
 (0, db_1.connectDB)();
 const app = (0, express_1.default)();
 // ✅ CORS – tillåt frontend både lokalt och på Vercel
-// app.use(cors({
-//   origin: [
-//     "http://localhost:5173",
-//     "https://e-shop-nu-two.vercel.app",
-//   ],
-//   credentials: true,
-// }));
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: [
+        "http://localhost:5173",
+        "https://e-shop-eight-lilac.vercel.app",
+    ],
+    credentials: true,
+}));
+// app.use(cors())
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 // ✅ Alla routes

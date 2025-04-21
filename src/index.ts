@@ -21,14 +21,14 @@ connectDB();
 const app = express();
 
 // ✅ CORS – tillåt frontend både lokalt och på Vercel
-// app.use(cors({
-//   origin: [
-//     "http://localhost:5173",
-//     "https://e-shop-nu-two.vercel.app",
-//   ],
-//   credentials: true,
-// }));
-app.use(cors())
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://e-shop-eight-lilac.vercel.app",
+  ],
+  credentials: true,
+}));
+// app.use(cors())
 
 app.use(express.json());
 app.use(cookieParser());
