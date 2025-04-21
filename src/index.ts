@@ -1,17 +1,17 @@
 import express from "express";
-import { connectDB } from "./config/db.js";
+import { connectDB } from "./config/db";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
 // ✅ Importera routes med .js – viktigt för Vercel
-import productRouter from "./routes/products.js";
-import customerRouter from "./routes/customers.js";
-import orderRouter from "./routes/orders.js";
-import orderItemRouter from "./routes/orderItems.js";
-import stripeRouter from "./routes/stripe.js";
-import authRouter from "./routes/auth.js";
-import searchRouter from "./routes/search.js"; // 👈 fixat här!
+import productRouter from "./routes/products";
+import customerRouter from "./routes/customers";
+import orderRouter from "./routes/orders";
+import orderItemRouter from "./routes/orderItems";
+import stripeRouter from "./routes/stripe";
+import authRouter from "./routes/auth";
+import searchRouter from "./routes/search"; // 👈 fixat här!
 
 dotenv.config();
 

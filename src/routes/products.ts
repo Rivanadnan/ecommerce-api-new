@@ -5,7 +5,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-} from "../controllers/productController.js"; // 🔁 lägg till .js för Vercel/ESM
+} from "../controllers/productController"; // 🔁 lägg till .js för Vercel/ESM
 
 const router = express.Router();
 
