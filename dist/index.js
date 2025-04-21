@@ -50,4 +50,4 @@ if (process.env.NODE_ENV !== "production") {
     });
 }
 // ✅ Export för Vercel
-exports.default = app;
+// export default app;
