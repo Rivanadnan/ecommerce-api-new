@@ -4,23 +4,22 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// ✅ Importera routes med .js – viktigt för Vercel
 import productRouter from "./routes/products";
 import customerRouter from "./routes/customers";
 import orderRouter from "./routes/orders";
 import orderItemRouter from "./routes/orderItems";
 import stripeRouter from "./routes/stripe";
 import authRouter from "./routes/auth";
-import searchRouter from "./routes/search"; // 👈 fixat här!
+import searchRouter from "./routes/search";
 
 dotenv.config();
 
-// 🔌 Koppla upp till databas
+
 connectDB();
 
 const app = express();
 
-// ✅ CORS – tillåt frontend både lokalt och på Vercel
+
 app.use(cors({
   origin: [
     "http://localhost:5173",
@@ -28,12 +27,11 @@ app.use(cors({
   ],
   credentials: true,
 }));
-// app.use(cors())
 
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Alla routes
+
 app.use("/products", productRouter);
 app.use("/customers", customerRouter);
 app.use("/orders", orderRouter);
@@ -42,12 +40,12 @@ app.use("/stripe", stripeRouter);
 app.use("/auth", authRouter);
 app.use("/search", searchRouter);
 
-// 🌐 Test-rutt
+
 app.get("/", (_, res) => {
   res.send("✅ E-commerce API is running!");
 });
 
-// 🚀 Kör server lokalt – INTE i production (Vercel hanterar detta)
+
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
@@ -55,5 +53,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// ✅ Export för Vercel
+
 export default app;
