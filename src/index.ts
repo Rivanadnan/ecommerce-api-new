@@ -14,11 +14,9 @@ import searchRouter from "./routes/search";
 
 dotenv.config();
 
-
 connectDB();
 
 const app = express();
-
 
 app.use(cors({
   origin: [
@@ -31,7 +29,6 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-
 app.use("/products", productRouter);
 app.use("/customers", customerRouter);
 app.use("/orders", orderRouter);
@@ -40,18 +37,9 @@ app.use("/stripe", stripeRouter);
 app.use("/auth", authRouter);
 app.use("/search", searchRouter);
 
-
 app.get("/", (_, res) => {
   res.send("✅ E-commerce API is running!");
 });
-
-
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`🚀 Server is running at http://localhost:${PORT}`);
-  });
-}
 
 
 export default app;
