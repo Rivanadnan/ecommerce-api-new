@@ -21,10 +21,11 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://e-shop-eight-lilac.vercel.app",
+    "https://e-shop-7ioktjyft-warmness-travels-projects.vercel.app", 
   ],
   credentials: true,
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());
