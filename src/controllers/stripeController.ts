@@ -5,10 +5,6 @@ import { db } from '../config/db';
 
 dotenv.config();
 
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-//   apiVersion: '2025-03-31.basil',
-// });
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2022-11-15',
 });
@@ -33,14 +29,19 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
     } else {
       const [result]: any = await db.query(
         'INSERT INTO customers (name, email) VALUES (?, ?)',
-        [customer.name, customer.email]
+        [`${customer.firstname} ${customer.lastname}`, customer.email]
       );
       customerId = result.insertId;
     }
 
+    const totalPrice = cart.reduce(
+      (sum: number, item: any) => sum + item.price * (item.quantity || 1),
+      0
+    );
+
     const [orderResult]: any = await db.query(
-      'INSERT INTO orders (customer_id, payment_status, payment_id, order_status) VALUES (?, ?, ?, ?)',
-      [customerId, 'Unpaid', '', 'Pending']
+      'INSERT INTO orders (customer_id, total_price, payment_status, payment_id, order_status) VALUES (?, ?, ?, ?, ?)',
+      [customerId, totalPrice, 'Unpaid', '', 'Pending']
     );
 
     const orderId = orderResult.insertId;
