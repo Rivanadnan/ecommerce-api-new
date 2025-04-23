@@ -65,8 +65,8 @@ export const checkoutSessionHosted = async (req: Request, res: Response) => {
         },
         quantity: item.quantity || 1,
       })),
-      success_url: `https://e-shop-nu-two.vercel.app/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://e-shop-nu-two.vercel.app/checkout`,
+      success_url: `https://e-shop-eight-lilac.vercel.app/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://e-shop-eight-lilac.vercel.app/checkout`,
       metadata: {
         order_id: orderId.toString(),
       },
