@@ -21,10 +21,13 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://e-shop-2ejrkojee-warmness-travels-projects.vercel.app/", 
+    "https://e-shop-eight-lilac.vercel.app",
+    "https://e-shop-7ioktjyft-warmness-travels-projects.vercel.app",
+    "https://e-shop-22yof5qn6-warmness-travels-projects.vercel.app", // 👈 NY
   ],
   credentials: true,
 }));
+
 
 
 app.use(express.json());
