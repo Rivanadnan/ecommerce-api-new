@@ -1,16 +1,16 @@
 import express from "express";
-import { connectDB } from "./config/db";
+import { connectDB } from "./src/config/db";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import productRouter from "./routes/products";
-import customerRouter from "./routes/customers";
-import orderRouter from "./routes/orders";
-import orderItemRouter from "./routes/orderItems";
-import stripeRouter from "./routes/stripe";
-import authRouter from "./routes/auth";
-import searchRouter from "./routes/search";
+import productRouter from "./src/routes/products";
+import customerRouter from "./src/routes/customers";
+import orderRouter from "./src/routes/orders";
+import orderItemRouter from "./src/routes/orderItems";
+import stripeRouter from "./src/routes/stripe";
+import authRouter from "./src/routes/auth";
+import searchRouter from "./src/routes/search";
 
 dotenv.config();
 
