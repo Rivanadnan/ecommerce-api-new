@@ -5,9 +5,13 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-} from "../controllers/productController"; // 🔁 lägg till .js för Vercel/ESM
+  searchProducts,
+} from "../controllers/productController"; // ✅ du kan använda .ts lokalt – .js på Vercel
 
 const router = express.Router();
+
+
+router.get("/search", searchProducts);
 
 router.get("/", getProducts);
 router.get("/:id", getProductById);

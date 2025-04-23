@@ -80,3 +80,22 @@ export const deleteProduct = async (req: Request, res: Response) => {
     res.status(500).json({ error: logError(error) });
   }
 };
+export const searchProducts = async (req: Request, res: Response) => {
+  const query = req.query.q as string;
+
+  if (!query) {
+    return res.status(400).json({ error: "Sökterm saknas" });
+  }
+
+  try {
+    const sql = `
+      SELECT * FROM products 
+      WHERE name LIKE ? OR category LIKE ?
+    `;
+    const wildcardQuery = `%${query}%`;
+    const [rows] = await db.query<IProduct[]>(sql, [wildcardQuery, wildcardQuery]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: logError(error) });
+  }
+};
