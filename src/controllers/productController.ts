@@ -91,36 +91,18 @@ export const searchProducts = async (req: Request, res: Response) => {
   }
 
   try {
-    const searchSql = `
+    const sql = `
       SELECT * FROM products 
       WHERE name LIKE ? OR category LIKE ?
       LIMIT ? OFFSET ?
     `;
-    const countSql = `
-      SELECT COUNT(*) as total FROM products 
-      WHERE name LIKE ? OR category LIKE ?
-    `;
-    const wildcardQuery = `%${query}%`;
-
-    const [products] = await db.query<IProduct[]>(searchSql, [
-      wildcardQuery,
-      wildcardQuery,
-      limit,
-      offset,
-    ]);
-
-    const [countRows] = await db.query<any[]>(countSql, [
-      wildcardQuery,
-      wildcardQuery,
-    ]);
-
-    const total = countRows[0]?.total || 0;
+    const wildcard = `%${query}%`;
+    const [rows] = await db.query<IProduct[]>(sql, [wildcard, wildcard, limit, offset]);
 
     res.json({
       currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalResults: total,
-      results: products,
+      results: rows,
+      nextPage: `/products/search?q=${query}&page=${page + 1}&limit=${limit}`
     });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
