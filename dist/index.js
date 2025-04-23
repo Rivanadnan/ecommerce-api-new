@@ -21,7 +21,7 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: [
         "http://localhost:5173",
-        "https://e-shop-7ioktjyft-warmness-travels-projects.vercel.app",
+        "https://e-shop-2ejrkojee-warmness-travels-projects.vercel.app/",
     ],
     credentials: true,
 }));
