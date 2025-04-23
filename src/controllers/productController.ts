@@ -82,19 +82,46 @@ export const deleteProduct = async (req: Request, res: Response) => {
 };
 export const searchProducts = async (req: Request, res: Response) => {
   const query = req.query.q as string;
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
 
   if (!query) {
     return res.status(400).json({ error: "Sökterm saknas" });
   }
 
   try {
-    const sql = `
+    const searchSql = `
       SELECT * FROM products 
+      WHERE name LIKE ? OR category LIKE ?
+      LIMIT ? OFFSET ?
+    `;
+    const countSql = `
+      SELECT COUNT(*) as total FROM products 
       WHERE name LIKE ? OR category LIKE ?
     `;
     const wildcardQuery = `%${query}%`;
-    const [rows] = await db.query<IProduct[]>(sql, [wildcardQuery, wildcardQuery]);
-    res.json(rows);
+
+    const [products] = await db.query<IProduct[]>(searchSql, [
+      wildcardQuery,
+      wildcardQuery,
+      limit,
+      offset,
+    ]);
+
+    const [countRows] = await db.query<any[]>(countSql, [
+      wildcardQuery,
+      wildcardQuery,
+    ]);
+
+    const total = countRows[0]?.total || 0;
+
+    res.json({
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalResults: total,
+      results: products,
+    });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
   }
