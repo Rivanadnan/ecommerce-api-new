@@ -45,8 +45,8 @@ const checkoutSessionHosted = async (req, res) => {
                 },
                 quantity: item.quantity || 1,
             })),
-            success_url: `https://e-shop-eight-lilac.vercel.app/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://e-shop-eight-lilac.vercel.app/checkout`,
+            success_url: `https://e-shop-h3tbmjtmr-warmness-travels-projects.vercel.app/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://e-shop-h3tbmjtmr-warmness-travels-projects.vercel.app/checkout`,
             metadata: {
                 order_id: orderId.toString(),
             },
@@ -60,11 +60,11 @@ const checkoutSessionHosted = async (req, res) => {
     }
 };
 exports.checkoutSessionHosted = checkoutSessionHosted;
-const checkoutSessionEmbedded = async (req, res) => {
+const checkoutSessionEmbedded = async (_req, res) => {
     return res.status(501).json({ message: 'Embedded checkout ej implementerad' });
 };
 exports.checkoutSessionEmbedded = checkoutSessionEmbedded;
-const webhook = async (req, res) => {
+const webhook = async (_req, res) => {
     return res.status(200).json({ message: 'Webhook mottagen (test)' });
 };
 exports.webhook = webhook;
