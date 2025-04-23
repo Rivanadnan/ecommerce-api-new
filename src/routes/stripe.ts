@@ -3,7 +3,7 @@ import {
   checkoutSessionHosted,
   checkoutSessionEmbedded,
   webhook,
-} from "../controllers/stripeController.js"; 
+} from "../controllers/stripeController"; 
 
 const router = express.Router();
 
