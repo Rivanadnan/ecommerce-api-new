@@ -3,7 +3,7 @@ import {
   checkoutSessionHosted,
   checkoutSessionEmbedded,
   webhook,
-} from "../controllers/stripeController"; // 🔁 OBS: filändelse krävs för ESM/Vercel
+} from "../controllers/stripeController.js"; 
 
 const router = express.Router();
 
